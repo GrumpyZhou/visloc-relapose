@@ -62,14 +62,22 @@ class Conv4d(_ConvNd):
         groups=1
         # zero padding is added automatically in conv4d function to preserve tensor size
         padding = 0
-        padding_mode = 'zeros'        
         kernel_size = _quadruple(kernel_size)
         stride = _quadruple(stride)
         padding = _quadruple(padding)
         dilation = _quadruple(dilation)
-        super(Conv4d, self).__init__(
-            in_channels, out_channels, kernel_size, stride, padding, dilation,
-            False, _quadruple(0), groups, bias, padding_mode)  
+        
+        if '0.4' in torch.__version__:
+            super(Conv4d, self).__init__(
+                in_channels, out_channels, kernel_size, stride, padding, dilation,
+                False, _quadruple(0), groups, bias)   
+        elif '1.' in torch.__version__:
+            super(Conv4d, self).__init__(
+                in_channels, out_channels, kernel_size, stride, padding, dilation,
+                False, _quadruple(0), groups, bias, padding_mode='zeros')
+        else:
+            print('Check your pytorch version!')
+
         # weights will be sliced along one dimension during convolution loop
         # make the looping dimension to be the first one in the tensor, 
         # so that we don't need to call contiguous() inside the loop
