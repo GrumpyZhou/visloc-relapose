@@ -117,6 +117,7 @@ def main():
                                                                worker_init_fn=make_deterministic(config.seed))
         train(net, config, log, train_loader, val_loaders)
     else:
+        lprint(config2str(config))
         lprint('----------------------------------------------\n', log)
         lprint('>>Load weights dict {}'.format(config.weights_dir), log)
         lprint('>>Testing pairs: {}'.format(config.pair_txt), log)
