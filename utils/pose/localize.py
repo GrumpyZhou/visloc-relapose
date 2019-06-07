@@ -4,7 +4,7 @@ import numpy as np
 import itertools
 import time
 from transforms3d.quaternions import quat2mat, mat2quat
-from utils.common.setup import lprint
+from utils.common.setup_helper import lprint
 from utils.pose.transform import angs2pose
 from utils.pose.measure import cal_quat_angle_error, cal_vec_angle_error
 import warnings
