@@ -5,6 +5,7 @@ import cv2
 import torch
 import torch.utils.data as data
 from utils.datasets.data_parsing import *
+from utils.datasets.camera_intrinsics import get_camera_intrinsic_loader
 
 __all__ = ['glob_scenes', 'get_datasets', 'VisualLandmarkDataset']
 
@@ -119,9 +120,9 @@ class VisualLandmarkDataset(RelaPoseDataset):
         # Loading virtual
         intrinsics = None
         if with_virtual_pts:
-            intrinsics = load_intrinsics(dataset, scene, 
-                                         im_list=list(pose_pairs.pose_dict.keys()), 
-                                         focal_dir=os.path.join(data_root, dataset))
+            intrinsics_loader = get_camera_intrinsic_loader(os.path.join(data_root, dataset),
+                                                            dataset, scene)
+            intrinsics = intrinsics_loader.get_intrinsic_matrices(im_list=list(pose_pairs.pose_dict.keys())
         super().__init__(os.path.join(data_root, dataset, scene), pose_pairs, 
                          transforms=transforms, with_virtual_pts=with_virtual_pts, intrinsics=intrinsics)
 
