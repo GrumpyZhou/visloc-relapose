@@ -7,9 +7,9 @@ from networks.base.resnet import ResNet34
 from networks.ncn.conv4d import Conv4d
 from networks.ncn.model import featureL2Norm, MutualMatching, FeatureCorrelation, maxpool4d, NeighConsensus     
     
-class ImMatchNet(BaseNet):
+class NCMatchNet(BaseNet):
     def __init__(self, config):
-        print('Build up MatchNet model...')
+        print('Build up NC-MatchNet model...')
         super().__init__(config)
         self.early_feat = config.early_feat
         self.half_precision = config.half_precision
