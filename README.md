@@ -1,7 +1,9 @@
 # Visual Localization Via Relative Camera Pose Estimation
 
 This repository provides implementation of  our paper:   To Learn or Not to Learn: Visual Localization from Essential Matrices [TO UPLOAD]
-![Pipeline](https://vision.in.tum.de/webshare/u/zhouq/visloc-relapose/pipeline.jpg)
+
+![Pipeline](pipeline/pipeline.jpg)
+
 To use our code, first download the repository:
 ````
 git clone git@github.com:GrumpyZhou/visloc-relapose.git
@@ -47,7 +49,7 @@ Our code is flexible for evaluation on various localization datasets. We use Cam
 #### 7Scenes Datasets
 We follow the camera pose label convention of Cambridge Landmarks dataset.  Similarly, you can download  [our pairs](https://vision.in.tum.de/webshare/u/zhouq/visloc-datasets/)  for 7Scenes. For **other datasets**, contact me for information about preprocessing and pair generation.
 
-------
+
 ##  Feature-based: SIFT + 5-Point Solver
 
 We use the SIFT feature extractor and feature matcher in [colmap](https://colmap.github.io/). One can follow the [installation guide](https://colmap.github.io/install.html) to install colmap. We save colmap outputs in database format, see [explanation](https://colmap.github.io/database.html).
@@ -61,10 +63,7 @@ bash prepare_colmap_data.sh  CambridgeLandmarks
 Here CambridgeLandmarks is the folder name that is consistent with the dataset folder. So you can also use other dataset names such as 7Scenes if you have prepared the dataset properly in advance.
 
 
-------
-
 ##  Learning-based: Direct Regression via EssNet
 
-------
 
 ## Hybrid: Learnable Matching + 5-Point Solver
