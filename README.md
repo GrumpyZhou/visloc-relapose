@@ -41,8 +41,10 @@ Our code is flexible for evaluation on various localization datasets. We use Cam
 6. Pre-save resized 480 images to speed up data loading time (Optional, but Recommended)
 	````
 	cd visloc-relapose/
-	mkdir data/datasets_480
-	 ## resize script [TO Add] 
+	python -m utils.datasets.resize_dataset \
+		--base_dir data/datasets_original/CambridgeLandmarks \ 
+		--save_dir=data/datasets_480/CambridgeLandmarks \
+		--resize 480  --copy_txt True 
 	````
 7. Test your setup by visualizing the data using [notebooks/data_loading.ipynb](notebooks/data_loading.ipynb) .
 8. (Optional) One can also resize the dataset images so that shorter side has 256 pixels at once makes training faster.
