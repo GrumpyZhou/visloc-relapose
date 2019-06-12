@@ -122,7 +122,8 @@ class VisualLandmarkDataset(RelaPoseDataset):
         if with_virtual_pts:
             intrinsics_loader = get_camera_intrinsic_loader(os.path.join(data_root, dataset),
                                                             dataset, scene)
-            intrinsics = intrinsics_loader.get_intrinsic_matrices(im_list=list(pose_pairs.pose_dict.keys())
+            intrinsics = intrinsics_loader.get_intrinsic_matrices(im_list=list(pose_pairs.pose_dict.keys()))
+                                                                  
         super().__init__(os.path.join(data_root, dataset, scene), pose_pairs, 
                          transforms=transforms, with_virtual_pts=with_virtual_pts, intrinsics=intrinsics)
 
