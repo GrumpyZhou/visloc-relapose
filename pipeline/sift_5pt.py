@@ -96,7 +96,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_root', '-droot',  type=str, default='data/datasets_original/')
     parser.add_argument('--dataset', '-ds',  type=str, default='CambridgeLandmarks',
-                        choices=['CambridgeLandmarks', 'PragueZurich', '7Scenes'])
+                        choices=['CambridgeLandmarks', '7Scenes'])
     parser.add_argument('--scenes', '-sc', type=str, nargs='*', default=None)
     parser.add_argument('--colmap_db_root', '-dbdir', type=str, default='data/colmap_dbs')
     parser.add_argument('--db_name', '-db', type=str, default='database.db')
