@@ -64,8 +64,59 @@ bash prepare_colmap_data.sh  CambridgeLandmarks
 ````
 Here CambridgeLandmarks is the folder name that is consistent with the dataset folder. So you can also use other dataset names such as 7Scenes if you have prepared the dataset properly in advance.
 
-
+### Evaluate SIFT within our pipeline
+Example to run sift+5pt on Cambridge Landmarks:
+````
+python -m pipeline.sift_5pt \
+        --data_root 'data/datasets_original/' \
+        --dataset 'CambridgeLandmarks' \
+        --pair_txt 'test_pairs.5nn.300cm50m.vlad.minmax.txt' \
+        --cv_ransac_thres 0.5\
+        --loc_ransac_thres 5\
+        -odir 'output/sift_5pt'\
+        -log 'results.dvlad.minmax.txt'
+````
+More evaluation examples see: [sift_5pt.sh](sift_5pt.sh). Check [example outputs](https://vision.in.tum.de/webshare/u/zhouq/visloc-relapose/sift_5pt/)
+Visualize SIFT correspondences using our notebook[TOADD].
 ##  Learning-based: Direct Regression via EssNet
+The _pipelin.relapose_regressor_ module can be used for  both training or testing our regression networks defined under *networks/*, e.g., EssNet, NCEssNet, RelaPoseNet... We provide training and testing examples in [regression.sh](regression.sh). 
+The module allows flexible variations of the setting. For more details about the module options, run `python -m pipeline.relapose_regressor -h`.
+### Training
+Here we show an example how to train an EssNet model on ShopFacade scene.
+````
+python -m pipeline.relapose_regressor \
+        --gpu 0 -b 16 --train -val 20 --epoch 200 \
+        --data_root 'data/datasets_480' -ds 'CambridgeLandmarks' \
+        --incl_sces 'ShopFacade' \
+        -rs 480 --crop 448 --normalize \
+        --ess_proj --network 'EssNet' --with_ess\
+        --pair 'train_pairs.30nn.medium.txt' -vpair 'val_pairs.5nn.medium.txt' \
+        -lr 0.0001 -wd 0.000001 \
+        --odir  'output/regression_models/example' \
+        -vp 9333 -vh 'localhost' -venv 'main' -vwin 'example.shopfacade' 
+````
+This command produces outputs are available online [here](https://vision.in.tum.de/webshare/u/zhouq/visloc-relapose/regression_models/example/). 
 
+#### Visdom (optional)
+As you see in the example above, we use [Visdom](https://github.com/facebookresearch/visdom) server to visualize the training process.  One can adapt the meters to plot inside [utils/common/visdom.py](utils/common/visdom.py). By default, previous example gives following plots[TOADD].
+If you DON'T want it, just remove the last line `-vp 9333 -vh 'localhost' -venv 'main' -vwin 'example.shopfacade'`.
 
-## Hybrid: Learnable Matching + 5-Point Solver
+#### Trained models and weights
+We release almost all trained models that are used in our paper. One can download them from [pretrained regression models](https://vision.in.tum.de/webshare/u/zhouq/visloc-relapose/regression_models).
+We also provide some [pretrained weights on MegaDepth/ScanNet](https://vision.in.tum.de/webshare/u/zhouq/visloc-relapose/pretrained_weights/). 
+
+### Testing
+Here is a piece of code to test the example model above.
+````
+python -m pipeline.relapose_regressor \
+        --gpu 2 -b 16  --test \
+        --data_root 'data/datasets_480' -ds 'CambridgeLandmarks' \
+        --incl_sces 'ShopFacade' \
+        -rs 480 --crop 448 --normalize\
+        --ess_proj --network 'EssNet'\
+        --pair 'test_pairs.5nn.300cm50m.vlad.minmax.txt'\
+        --resume 'output/regression_models/example/ckpt/???' \
+        --odir 'output/regression_models/example'
+````
+This testing code outputs are shown in  [test_results.txt](TODO).
+For convenience, we also provide [notebooks/eval_regression_model.ipynb](notebooks/eval_regression_model.ipynb) to perform evaluation.(TODO). Howeve, testing larger dataset such as 7Scenes takes quite some time, so in case notebook stops in the middle, running commands directly is recommended.
