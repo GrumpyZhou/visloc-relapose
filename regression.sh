@@ -20,7 +20,7 @@ python -m pipeline.relapose_regressor \
         -rs 480 --crop 448 --normalize\
         --ess_proj --network 'EssNet'\
         --pair 'test_pairs.5nn.300cm50m.vlad.minmax.txt'\
-        --resume 'output/regression_models/example/ckpt/???' \
+        --resume 'output/regression_models/example/ckpt/checkpoint_140_0.36m_1.97deg.pth' \
         --odir 'output/regression_models/example'
         
 # Test 448 7Scenes
