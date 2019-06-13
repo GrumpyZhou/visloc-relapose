@@ -8,7 +8,8 @@ import torch.utils.data as data
 import numpy as np
 import networks
 
-from utils.common.setup_helper import RelaPoseConfig, lprint, make_deterministic, config2str
+from utils.common.setup_helper import lprint, make_deterministic, config2str
+from utils.common.relapose_config import RelaPoseConfig
 from utils.datasets.relapose import VisualLandmarkDataset, get_datasets
 from utils.common.visdom import RelaPoseTmp
 from utils.pose.localize import eval_prediction, eval_pipeline_with_ransac
@@ -34,7 +35,7 @@ def train(net, config, log, train_loader, val_loaders=None):
                        'network': config.network,
                        'state_dict': net.state_dict(),
                        'optimizer' : net.optimizer.state_dict()}
-        torch.save(current_ckpt, os.path.join(config.ckpt_dir, 'checkpoint.current{}.pth'.format(epoch+1)))
+        torch.save(current_ckpt, os.path.join(config.ckpt_dir, 'checkpoint.current.pth'))
         if config.validate and (epoch+1) % config.validate == 0 and epoch > 0 :
             # Evaluate on validation set
             abs_err = test(net, config, log, val_loaders)
