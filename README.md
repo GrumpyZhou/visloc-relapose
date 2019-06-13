@@ -120,3 +120,29 @@ python -m pipeline.relapose_regressor \
 ````
 This testing code outputs are shown in  [test_results.txt](TODO).
 For convenience, we also provide [notebooks/eval_regression_model.ipynb](notebooks/eval_regression_model.ipynb) to perform evaluation.(TODO). Howeve, testing larger dataset such as 7Scenes takes quite some time, so in case notebook stops in the middle, running commands directly is recommended.
+
+
+## Hybrid: Learnable Matching + 5-Point Solver
+In this method, the code of the NCNet is taken from the original implementation [https://github.com/ignacio-rocco/ncnet](https://github.com/ignacio-rocco/ncnet). We use their pre-trained model but we only use the weights for neighbourhood consensus(NC-Matching), i.e., the 4d-conv layer weights.  For convenience, you can download our parsed version [nc_ivd_5ep.pth](https://vision.in.tum.de/webshare/u/zhouq/visloc-relapose/pretrained_weights/nc_ivd_5ep.pth). The models for feature extractor initialization needs to be downloaded from [pretrained regression models](https://vision.in.tum.de/webshare/u/zhouq/visloc-relapose/regression_models).
+ in advance, if you want to test them.
+
+### Testing example for  NC-EssNet(7S)+NCM+5Pt (Paper.Tab2)
+In this example, we use **NCEssNet** trained on **7Scenes** for 60 epochs to extract features  and use the **pre-trained NC Matching layer** to get the point matches. Finally **5 point solver** calculates the essential matrix. The model is evaluated on **CambridgeLandmarks**. 
+````
+# 
+python -m pipeline.ncmatch_5pt \
+    --data_root 'data/datasets_original' \
+    --dataset 'CambridgeLandmarks' \
+    --pair_txt 'test_pairs.5nn.300cm50m.vlad.minmax.txt' \
+    --cv_ransac_thres 4.0\
+    --loc_ransac_thres 15\
+    --feat 'output/regression_models/448_normalize/nc-essnet/7scenes/checkpoint_60_0.04m_1.62deg.pth'\
+    --ncn 'output/pretrained_weights/nc_ivd_5ep.pth' \    
+    --posfix 'essncn_7sc_60ep+ncn'\
+    --match_save_root 'output/ncmatch_5pt/saved_matches'\
+    --ncn_thres 0.9 \
+    --gpu 2\
+    -o 'output/ncmatch_5pt/loc_results/Cambridge/essncn_7sc_60ep+ncn.txt' 
+````
+
+Example outputs is available [here](https://vision.in.tum.de/webshare/u/zhouq/visloc-relapose/ncmatch_5pt/). If you don't want to save intermediate matches extracted, remove option `--match_save_root`.
