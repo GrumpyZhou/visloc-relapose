@@ -8,7 +8,7 @@ from utils.common.setup_helper import lprint
 from utils.colmap.read_database import COLMAPDataLoader, extract_pair_pts
 from utils.datasets.camera_intrinsics import get_camera_intrinsic_loader
 from utils.datasets.data_parsing import parse_abs_pose_txt, parse_matching_pairs
-from utils.pose.localize import *
+from utils.eval.localize import *
 
 def predict_essential_matrix(data_root, dataset, scenes,
                              pair_txt, train_lbl_txt, test_lbl_txt, 

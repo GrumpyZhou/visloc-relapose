@@ -12,7 +12,8 @@ from utils.common.setup_helper import lprint, make_deterministic, config2str
 from utils.common.relapose_config import RelaPoseConfig
 from utils.datasets.relapose import VisualLandmarkDataset, get_datasets
 from utils.common.visdom import RelaPoseTmp
-from utils.pose.localize import eval_prediction, eval_pipeline_with_ransac
+from utils.eval.predict_regression import eval_prediction
+from utils.eval.localize import eval_pipeline_with_ransac
 
 def train(net, config, log, train_loader, val_loaders=None):
     # Setup visdom monitor

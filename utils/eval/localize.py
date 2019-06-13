@@ -5,7 +5,7 @@ import itertools
 import time
 from transforms3d.quaternions import quat2mat, mat2quat
 from utils.common.setup_helper import lprint
-from utils.pose.measure import cal_quat_angle_error, cal_vec_angle_error
+from utils.eval.measure import cal_quat_angle_error, cal_vec_angle_error
 import warnings
 
 def eval_pipeline_with_ransac(result_dict, log, ransac_thres, ransac_iter, 
