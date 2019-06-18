@@ -41,8 +41,8 @@ python -m pipeline.relapose_regressor \
     -rs 256 --crop 224 \
     --ess_proj --network 'EssNet'\
     --pair 'test_pairs.5nn.5cm10m.vlad.minmax.txt'\
-    --resume 'output/regression_models/224_unnormalize/essnet/leverage_datasets/ft_scannet/checkpoint_280_0.02m_0.12deg.pth'\
-    --odir 'output/regression_models/224_unnormalize/essnet/leverage_datasets/ft_scannet'
+    --resume 'output/regression_models/224_unnormalize/essnet/leverage_datasets/ft_mega55/CL_7S/checkpoint_120_0.24m_0.91deg.pth'\
+    --odir 'output/regression_models/224_unnormalize/essnet/leverage_datasets/ft_mega55/CL_7S'
     
 # Test relaposenet 224 7Scenes
 python -m pipeline.relapose_regressor \
