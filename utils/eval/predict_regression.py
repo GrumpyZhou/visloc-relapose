@@ -1,6 +1,6 @@
 import time
 from utils.common.setup_helper import lprint
-from utils.pose.localize import *
+from utils.eval.localize import *
 
 def eval_prediction(data_loaders, net, log, pair_type='ess'):
     '''The function evaluates network predictions and prepare results for RANSAC and convenient accuracy calculation.
