@@ -93,8 +93,8 @@ class NCMatchNet(BaseNet):
     def update_weights_(self, feat_dict=None, ncn_dict=None):
         model_dict = self.state_dict()
         if feat_dict is not None:
-            print('Overwrite extractor weights...')
             feat_dict = {k: v for k, v in feat_dict.items() if k in model_dict and k.startswith('extract')}
+            print('Overwrite extractor weights, keys:{}'.format(len(feat_dict)))
             model_dict.update(feat_dict) 
         if ncn_dict is not None:
             print('Overwrite ncn weights...')

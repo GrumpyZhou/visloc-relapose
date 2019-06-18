@@ -1,5 +1,5 @@
 import torch
-
+from utils.common.setup_helper import load_weights
 # TODO: Add training config for NCMatchNet and its setup function?
 
 class NCMatchEvalConfig:
@@ -20,10 +20,9 @@ class NCMatchEvalConfig:
         
         # Load model weights  
         self.device = torch.device('cuda:{}'.format(gpu) if torch.cuda.is_available() else 'cpu')
-        map_location = lambda storage, loc: storage.cuda(self.device.index) if torch.cuda.is_available() else storage
-        self.weights_dict = torch.load(weights_dir, map_location=map_location) if weights_dir else None
-        self.feat_weights = torch.load(feat_weights, map_location=map_location) if feat_weights else None
-        self.ncn_weights = torch.load(ncn_weights, map_location=map_location) if ncn_weights else None
+        self.weights_dict = load_weights(weights_dir, self.device)
+        self.feat_weights = load_weights(feat_weights, self.device)
+        self.ncn_weights = load_weights(ncn_weights, self.device)
         
         # Logging
         self.odir = odir
