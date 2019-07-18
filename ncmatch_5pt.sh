@@ -1,7 +1,7 @@
 #!/bin/bash
 
-#### Test hybrid
-# Imagenet + ncn
+#### Test
+# Imagenet + ncn [Checked]
 python -m pipeline.ncmatch_5pt \
     --data_root 'data/datasets_original' \
     --dataset 'CambridgeLandmarks' \
@@ -13,9 +13,8 @@ python -m pipeline.ncmatch_5pt \
     --posfix 'imagenet+ncn'\
     --ncn_thres 0.9 \
     --gpu 1\
-    -o 'output/ncmatch_5pt/loc_results/Cambridge/imagenet+ncn.txt'
+    -o 'output/ncmatch_5pt/loc_results/Cambridge/imagenet+ncn.txt'    
     
-# 103268
 python -m pipeline.ncmatch_5pt \
     --data_root 'data/datasets_original' \
     --dataset '7Scenes' \
@@ -29,7 +28,7 @@ python -m pipeline.ncmatch_5pt \
     -o 'output/ncmatch_5pt/loc_results/7Scenes/imagenet+ncn.txt'
 
 
-# EssNCNet trained on 7Scenes 60ep
+# EssNCNet trained on 7Scenes 60ep  DEBUG
 python -m pipeline.ncmatch_5pt \
     --data_root 'data/datasets_original' \
     --dataset 'CambridgeLandmarks' \
@@ -37,14 +36,27 @@ python -m pipeline.ncmatch_5pt \
     --cv_ransac_thres 4.0\
     --loc_ransac_thres 15\
     --feat 'output/regression_models/448_normalize/nc-essnet/7scenes/checkpoint_60_0.04m_1.62deg.pth'\
-    --ncn 'output/pretrained_weights/nc_ivd_5ep.pth' \    
+    --ncn 'output/pretrained_weights/nc_ivd_5ep.pth' \
     --posfix 'essncn_7sc_60ep+ncn'\
-    --match_save_root 'output/ncmatch_5pt/saved_matches'\
+    --match_save_root 'output/ncmatch_5pt/saved_matches' \
     --ncn_thres 0.9 \
     --gpu 2\
-    -o 'output/ncmatch_5pt/loc_results/Cambridge/essncn_7sc_60ep+ncn.txt' 
+    -o 'output/ncmatch_5pt/loc_results/Cambridge/essncn_7sc_60ep+ncn.txt'
 
-# 103269
+# python -m pipeline.ncmatch_5pt \
+#     --data_root 'data/datasets_original' \
+#     --dataset 'CambridgeLandmarks' \
+#     --pair_txt 'test_pairs.5nn.300cm50m.vlad.minmax.txt' \
+#     --cv_ransac_thres 4.0\
+#     --loc_ransac_thres 15\
+#     --feat 'output/regression_models/448_normalize/nc-essnet/7scenes/checkpoint_60_0.04m_1.62deg.pth'\
+#     --ncn 'output/pretrained_weights/nc_ivd_5ep.pth' \
+#     --posfix 'essncn_7sc_60ep+ncn_repro'\
+#     --match_save_root 'output/ncmatch_5pt/saved_matches' \
+#     --ncn_thres 0.9 \
+#     --gpu 1\
+#     -o 'output/ncmatch_5pt/loc_results/Cambridge/essncn_7sc_60ep+ncn.repro.txt'
+
 python -m pipeline.ncmatch_5pt \
     --data_root 'data/datasets_original' \
     --dataset '7Scenes' \
@@ -58,7 +70,34 @@ python -m pipeline.ncmatch_5pt \
     --ncn_thres 0.9 \
     -o 'output/ncmatch_5pt/loc_results/7Scenes/essncn_7sc_60ep+ncn.txt' 
 
-## EssNet224 on Scannet 95ep
+# EssNCNet trained on Cambridge 100ep 
+python -m pipeline.ncmatch_5pt \
+    --data_root 'data/datasets_original' \
+    --dataset 'CambridgeLandmarks' \
+    --pair_txt 'test_pairs.5nn.300cm50m.vlad.minmax.txt' \
+    --cv_ransac_thres 4.0\
+    --loc_ransac_thres 15\
+    --feat 'output/regression_models/448_normalize/nc-essnet/cambridge/checkpoint_100_0.86m_1.96deg.pth'\
+    --ncn 'output/pretrained_weights/nc_ivd_5ep.pth' \
+    --posfix 'essncn_camb_100ep+ncn'\
+    --match_save_root 'output/ncmatch_5pt/saved_matches'\
+    --ncn_thres 0.9 \
+    -o 'output/ncmatch_5pt/loc_results/Cambridge/essncn_camb_100ep+ncn.txt' 
+
+python -m pipeline.ncmatch_5pt \
+    --data_root 'data/datasets_original' \
+    --dataset '7Scenes' \
+    --pair_txt 'test_pairs.5nn.5cm10m.vlad.minmax.txt' \
+    --cv_ransac_thres 5.5 \
+    --loc_ransac_thres 20 \
+    --feat 'output/regression_models/448_normalize/nc-essnet/cambridge/checkpoint_100_0.86m_1.96deg.pth'\
+    --ncn 'output/pretrained_weights/nc_ivd_5ep.pth' \
+    --posfix 'essncn_camb_100ep+ncn'\
+    --match_save_root 'output/ncmatch_5pt/saved_matches'\
+    --ncn_thres 0.9 \
+    -o 'output/ncmatch_5pt/loc_results/7Scenes/essncn_camb_100ep+ncn.txt' 
+
+## EssNet224 on Scannet 95ep [Checked]
 python -m pipeline.ncmatch_5pt \
     --data_root 'data/datasets_original' \
     --dataset 'CambridgeLandmarks' \
@@ -71,9 +110,8 @@ python -m pipeline.ncmatch_5pt \
     --match_save_root 'output/ncmatch_5pt/saved_matches'\
     --ncn_thres 0.9 \
     --gpu 3 \
-    -o 'output/ncmatch_5pt/loc_results/Cambridge/ess224_scan95+ncn.txt' 
+    -o 'output/ncmatch_5pt/loc_results/Cambridge/ess224_scan95+ncn.txt'
 
-# 103270
 python -m pipeline.ncmatch_5pt \
     --data_root 'data/datasets_original' \
     --dataset '7Scenes' \
@@ -85,7 +123,64 @@ python -m pipeline.ncmatch_5pt \
     --posfix 'essnet224_scan95+ncn' \
     --match_save_root 'output/ncmatch_5pt/saved_matches'\
     --ncn_thres 0.9 \
-    -o 'output/ncmatch_5pt/loc_results/7Scenes/7Scenes/ess224_scan95+ncn.txt'
+    -o 'output/ncmatch_5pt/loc_results/7Scenes/ess224_scan95+ncn.txt'
+
+## EssNet224 on Mega 55ep
+python -m pipeline.ncmatch_5pt \
+    --data_root 'data/datasets_original' \
+    --dataset 'CambridgeLandmarks' \
+    --pair_txt 'test_pairs.5nn.300cm50m.vlad.minmax.txt' \
+    --cv_ransac_thres 4.0\
+    --loc_ransac_thres 15\
+    --feat 'output/pretrained_weights/essnet_mega55ep.pth'\
+    --ncn 'output/pretrained_weights/nc_ivd_5ep.pth' \
+    --posfix 'essnet_mega55ep+ncn' \
+    --match_save_root 'output/ncmatch_5pt/saved_matches'\
+    --ncn_thres 0.9 \
+    --gpu 3 \
+    -o 'output/ncmatch_5pt/loc_results/Cambridge/essnet_mega55ep+ncn.txt'
+
+python -m pipeline.ncmatch_5pt \
+    --data_root 'data/datasets_original' \
+    --dataset '7Scenes' \
+    --pair_txt 'test_pairs.5nn.5cm10m.vlad.minmax.txt' \
+    --cv_ransac_thres 5.5 \
+    --loc_ransac_thres 20 \
+    --feat 'output/pretrained_weights/essnet_mega55ep.pth'\
+    --ncn 'output/pretrained_weights/nc_ivd_5ep.pth' \
+    --posfix 'essnet_mega55ep+ncn' \
+    --match_save_root 'output/ncmatch_5pt/saved_matches'\
+    --ncn_thres 0.9 \
+    -o 'output/ncmatch_5pt/loc_results/7Scenes/essnet_mega55ep+ncn.txt'
+
+
+## EssNet224 on MD+7S+CL
+python -m pipeline.ncmatch_5pt \
+    --data_root 'data/datasets_original' \
+    --dataset 'CambridgeLandmarks' \
+    --pair_txt 'test_pairs.5nn.300cm50m.vlad.minmax.txt' \
+    --cv_ransac_thres 4.0\
+    --loc_ransac_thres 15\
+    --feat 'output/regression_models/224_unnormalize/essnet/leverage_datasets/ft_mega55/CL_7S/checkpoint_120_0.24m_0.91deg.pth'\
+    --ncn 'output/pretrained_weights/nc_ivd_5ep.pth' \
+    --posfix 'ess224_ftMC7+ncn' \
+    --match_save_root 'output/ncmatch_5pt/saved_matches'\
+    --ncn_thres 0.9 \
+    --gpu 3 \
+    -o 'output/ncmatch_5pt/loc_results/Cambridge/ess224_ftMC7+ncn.txt'
+
+python -m pipeline.ncmatch_5pt \
+    --data_root 'data/datasets_original' \
+    --dataset '7Scenes' \
+    --pair_txt 'test_pairs.5nn.5cm10m.vlad.minmax.txt' \
+    --cv_ransac_thres 5.5 \
+    --loc_ransac_thres 20 \
+    --feat 'output/regression_models/224_unnormalize/essnet/leverage_datasets/ft_mega55/CL_7S/checkpoint_120_0.24m_0.91deg.pth'\
+    --ncn 'output/pretrained_weights/nc_ivd_5ep.pth' \
+    --posfix 'ess224_ftMC7+ncn' \
+    --match_save_root 'output/ncmatch_5pt/saved_matches'\
+    --ncn_thres 0.9 \
+    -o 'output/ncmatch_5pt/loc_results/7Scenes/ess224_ftMC7+ncn.txt'
 
 
 #### Train
