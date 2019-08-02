@@ -12,7 +12,7 @@ python -m pipeline.relapose_regressor \
         --odir  'output/regression_models/example' \
         -vp 9333 -vh 'localhost' -venv 'main' -vwin 'example.shopfacade'
 
-#  Testing Example
+#  Testing 448 EssNet
 python -m pipeline.relapose_regressor \
         --gpu 2 -b 16  --test \
         --data_root 'data/datasets_480' -ds 'CambridgeLandmarks' \
@@ -23,7 +23,7 @@ python -m pipeline.relapose_regressor \
         --resume 'output/regression_models/example/ckpt/checkpoint_140_0.36m_1.97deg.pth' \
         --odir 'output/regression_models/example'
         
-# Test 448 7Scenes
+# Test 448 NCEssNet 7Scenes
 python -m pipeline.relapose_regressor \
         --gpu 2 -b 16  --test \
         --data_root 'data/datasets_480' -ds '7Scenes' \
@@ -34,7 +34,52 @@ python -m pipeline.relapose_regressor \
         --odir 'output/regression_models/448_normalize/nc-essnet/7scenes'
 
 
-# Test 224 7Scenes
+# Generalization
+# NC on 7sc generalize to ca
+python -m pipeline.relapose_regressor \
+        --gpu 2 -b 16  --test \
+        --data_root 'data/datasets_480' -ds 'CambridgeLandmarks' \
+        -rs 480 --crop 448 --normalize\
+        --ess_proj --network 'NCEssNet'\
+        --pair 'test_pairs.5nn.300cm50m.vlad.minmax.txt'\
+        --resume 'output/regression_models/448_normalize/nc-essnet/7scenes/checkpoint_60_0.04m_1.62deg.pth' \
+        --odir 'output/regression_models/448_normalize/nc-essnet/7scenes'
+
+# NC on camb generalize to 7s
+python -m pipeline.relapose_regressor \
+        --gpu 2 -b 16  --test \
+        --data_root 'data/datasets_480' -ds '7Scenes' \
+        -rs 480 --crop 448 --normalize\
+        --ess_proj --network 'NCEssNet'\
+        --pair 'test_pairs.5nn.5cm10m.vlad.minmax.txt'\
+        --resume 'output/regression_models/448_normalize/nc-essnet/cambridge/checkpoint_100_0.86m_1.96deg.pth' \
+        --odir 'output/regression_models/448_normalize/nc-essnet/cambridge'
+
+# Ess on 7s generalize to ca
+python -m pipeline.relapose_regressor \
+        --gpu 2 -b 16  --test \
+        --data_root 'data/datasets_480' -ds 'CambridgeLandmarks' \
+        -rs 480 --crop 448 --normalize\
+        --ess_proj --network 'EssNet'\
+        --pair 'test_pairs.5nn.300cm50m.vlad.minmax.txt'\
+        --resume 'output/regression_models/448_normalize/essnet/7scenes/checkpoint_100_0.03m_1.39deg.pth' \
+        --odir 'output/regression_models/448_normalize/essnet/7scenes'
+
+# Ess on ca generalize to 7s
+python -m pipeline.relapose_regressor \
+        --gpu 2 -b 16  --test \
+        --data_root 'data/datasets_480' -ds '7Scenes' \
+        -rs 480 --crop 448 --normalize\
+        --ess_proj --network 'EssNet'\
+        --pair 'test_pairs.5nn.5cm10m.vlad.minmax.txt'\
+        --resume 'output/regression_models/448_normalize/essnet/cambridge/checkpoint_100_0.69m_1.79deg.pth' \
+        --odir 'output/regression_models/448_normalize/essnet/cambridge'
+
+
+
+#----------------
+
+# Test 224 EssNet 7Scenes
 python -m pipeline.relapose_regressor \
     --gpu 2 -b 16  --test \
     --data_root 'data/datasets_256' -ds '7Scenes' \
