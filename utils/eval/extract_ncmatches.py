@@ -3,7 +3,8 @@ import torch.nn
 from torch.autograd import Variable
 import numpy as np
 
-def corr_to_matches(corr4d, delta4d=None, k_size=1, do_softmax=False, scale='centered', return_indices=False, invert_matching_direction=False):
+def corr_to_matches(corr4d, delta4d=None, k_size=1, do_softmax=False, scale='centered', 
+                    invert_matching_direction=False, return_indices=False):
     to_cuda = lambda x: x.cuda() if corr4d.is_cuda else x        
     batch_size,ch,fs1,fs2,fs3,fs4 = corr4d.size()
     
@@ -74,28 +75,32 @@ def corr_to_matches(corr4d, delta4d=None, k_size=1, do_softmax=False, scale='cen
     yA=YA[iA.view(-1),jA.view(-1)].view(batch_size,-1)
     xB=XB[iB.view(-1),jB.view(-1)].view(batch_size,-1)
     yB=YB[iB.view(-1),jB.view(-1)].view(batch_size,-1)
-    
+        
     if return_indices:
-        return (xA,yA,xB,yB,score,iA,jA,iB,jB)
+        return (jA,iA,jB,iB,score)
     else:
         return (xA,yA,xB,yB,score)
     
-def cal_matches(corr4d, delta4d, k_size=2, do_softmax=True, matching_both_directions=True):
+def cal_matches(corr4d, delta4d, k_size=2, do_softmax=True, 
+                matching_both_directions=True, 
+                recenter=True, return_indices=False):
     # reshape corr tensor and get matches for each point in image B
     batch_size,ch,fs1,fs2,fs3,fs4 = corr4d.size()
     if matching_both_directions:
-        (xA_,yA_,xB_,yB_,score_)=corr_to_matches(corr4d,scale='positive',
+        (xA_,yA_,xB_,yB_,score_) = corr_to_matches(corr4d,scale='positive',
                                                  do_softmax=do_softmax,
-                                                 delta4d=delta4d,k_size=k_size)
-        (xA2_,yA2_,xB2_,yB2_,score2_)=corr_to_matches(corr4d,scale='positive',
+                                                 delta4d=delta4d,k_size=k_size,
+                                                 return_indices=return_indices)
+        (xA2_,yA2_,xB2_,yB2_,score2_) = corr_to_matches(corr4d,scale='positive',
                                                       do_softmax=do_softmax,delta4d=delta4d,
-                                                      k_size=k_size,invert_matching_direction=True)
+                                                      k_size=k_size,invert_matching_direction=True,
+                                                      return_indices=return_indices)
         xA_=torch.cat((xA_,xA2_),1)
         yA_=torch.cat((yA_,yA2_),1)
         xB_=torch.cat((xB_,xB2_),1)
         yB_=torch.cat((yB_,yB2_),1)
         score_=torch.cat((score_,score2_),1)
-        
+
         # sort in descending score (this will keep the max-score instance in the duplicate removal step)
         sorted_index=torch.sort(-score_)[1].squeeze()
         xA_=xA_.squeeze()[sorted_index].unsqueeze(0)
@@ -113,6 +118,7 @@ def cal_matches(corr4d, delta4d, k_size=2, do_softmax=True, matching_both_direct
         xB_=xB_.squeeze()[torch.cuda.LongTensor(unique_index)].unsqueeze(0)
         yB_=yB_.squeeze()[torch.cuda.LongTensor(unique_index)].unsqueeze(0)
         score_=score_.squeeze()[torch.cuda.LongTensor(unique_index)].unsqueeze(0)
+
     elif flip_matching_direction:
         (xA_,yA_,xB_,yB_,score_)=corr_to_matches(corr4d, scale='positive',
                                                  do_softmax=do_softmax,
@@ -125,21 +131,27 @@ def cal_matches(corr4d, delta4d, k_size=2, do_softmax=True, matching_both_direct
                                                  delta4d=delta4d, 
                                                  k_size=k_size)
     # recenter
-    if k_size>1:
-        yA_=yA_*(fs1*k_size-1)/(fs1*k_size)+0.5/(fs1*k_size)
-        xA_=xA_*(fs2*k_size-1)/(fs2*k_size)+0.5/(fs2*k_size)
-        yB_=yB_*(fs3*k_size-1)/(fs3*k_size)+0.5/(fs3*k_size)
-        xB_=xB_*(fs4*k_size-1)/(fs4*k_size)+0.5/(fs4*k_size)    
+    if recenter:
+        if k_size>1:
+            yA_=yA_*(fs1*k_size-1)/(fs1*k_size)+0.5/(fs1*k_size)
+            xA_=xA_*(fs2*k_size-1)/(fs2*k_size)+0.5/(fs2*k_size)
+            yB_=yB_*(fs3*k_size-1)/(fs3*k_size)+0.5/(fs3*k_size)
+            xB_=xB_*(fs4*k_size-1)/(fs4*k_size)+0.5/(fs4*k_size)    
+        else:
+            yA_=yA_*(fs1-1)/fs1+0.5/fs1
+            xA_=xA_*(fs2-1)/fs2+0.5/fs2
+            yB_=yB_*(fs3-1)/fs3+0.5/fs3
+            xB_=xB_*(fs4-1)/fs4+0.5/fs4
+    
+    if return_indices:
+        xA = xA_.view(-1).data.cpu().numpy()
+        yA = yA_.view(-1).data.cpu().numpy()
+        xB = xB_.view(-1).data.cpu().numpy()
+        yB = yB_.view(-1).data.cpu().numpy()        
     else:
-        yA_=yA_*(fs1-1)/fs1+0.5/fs1
-        xA_=xA_*(fs2-1)/fs2+0.5/fs2
-        yB_=yB_*(fs3-1)/fs3+0.5/fs3
-        xB_=xB_*(fs4-1)/fs4+0.5/fs4
-
-    xA = xA_.view(-1).data.cpu().float().numpy()
-    yA = yA_.view(-1).data.cpu().float().numpy()
-    xB = xB_.view(-1).data.cpu().float().numpy()
-    yB = yB_.view(-1).data.cpu().float().numpy()
+        xA = xA_.view(-1).data.cpu().float().numpy()
+        yA = yA_.view(-1).data.cpu().float().numpy()
+        xB = xB_.view(-1).data.cpu().float().numpy()
+        yB = yB_.view(-1).data.cpu().float().numpy()
     score = score_.view(-1).data.cpu().float().numpy()
     return xA, yA, xB, yB, score
-

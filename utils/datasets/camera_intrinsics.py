@@ -34,8 +34,10 @@ class CambridgeLandmarks:
                 focals[cur[0].replace('jpg', 'png')] = float(line.split()[1])
         return focals
     
-    def get_intrinsic_matrices(self, im_list):
+    def get_intrinsic_matrices(self, im_list=None):
         matrices = {}
+        if im_list is None:
+            im_list = list(self.focals.keys())
         for im in im_list:
             f = self.focals[im]
             K = np.array([[f, 0, self.ox], [0, f, self.oy], [0, 0, 1]], dtype=np.float32) 
