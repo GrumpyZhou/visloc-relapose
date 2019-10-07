@@ -24,7 +24,7 @@ def eval_prediction(data_loaders, net, log, pair_type='ess'):
         total_num = len(data_loaders[dataset].dataset)
         pair_data = {}
         result_dict[dataset] = {}
-        for i, batch in enumerate(data_loader):
+        for j, batch in enumerate(data_loader):
             pred_vec = net.predict_(batch)
 
             # Calculate poses per query image
