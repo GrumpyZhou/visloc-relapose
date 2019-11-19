@@ -1,5 +1,4 @@
 import os
-import torch
 import numpy as np
 import itertools
 import time
@@ -484,22 +483,42 @@ def essential_matrix_from_pose(R, t):
     E = t_skew.dot(R)
     return E.astype(np.float32)
 
+#Will give worse results than the opencv implementation for some cases.
+#def decompose_essential_matrix(E):
+#     """Extract possible pose from essential matrix
+#     Args:
+#         - E: essential matrix, shape(3,3)
+#     Return:
+#         - t: one possible translation, the other is -t
+#         - R1, R2: possible rotation
+#     """
+#     u, s, vh = np.linalg.svd(E)
+#     if np.linalg.det(u) < 0 or np.linalg.det(vh) < 0:
+#         u,s,vh = np.linalg.svd(-E)
+#     t = u[:,2]
+#     w = np.array([[0, -1, 0], [1, 0, 0], [0, 0, 1]])
+#     R1 = u.dot(w).dot(vh)
+#     R2 = u.dot(w.T).dot(vh)
+#     return (t,R1,R2)
+
 def decompose_essential_matrix(E):
-    """Extract possible pose from essential matrix
+    """Extract possible pose from essential matrix(opencv version)
     Args:
         - E: essential matrix, shape(3,3)
     Return:
         - t: one possible translation, the other is -t
         - R1, R2: possible rotation
-    """
-    u, s, vh = np.linalg.svd(E)
-    if np.linalg.det(u) < 0 or np.linalg.det(vh) < 0:
-        u,s,vh = np.linalg.svd(-E)
+    """    
+    u, s, vh = np.linalg.svd(E)    
+    if np.linalg.det(u) < 0:
+        u = -u
+    if np.linalg.det(vh) < 0:
+        vh = -vh
     t = u[:,2]
-    w = np.array([[0, -1, 0], [1, 0, 0], [0, 0, 1]])
+    w = np.array([[0, 1, 0], [-1, 0, 0], [0, 0, 1]])
     R1 = u.dot(w).dot(vh)
     R2 = u.dot(w.T).dot(vh)
-    return (t,R1,R2)
+    return (t, R1, R2)
 
 #############################
 ####DATA WRAPPER CLASSES#####
