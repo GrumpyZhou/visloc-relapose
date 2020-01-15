@@ -58,6 +58,14 @@ class NCEssNet(BaseNet):
         if self.config.ess_proj:
             ess = self.projection_layer(ess)
         return ess
+
+    def forward_export_proj(self, x1, x2):  # For experiments
+        corr4d, _  = self.forward_corr4d(x1, x2)
+        N, _, H, W, _, _ = corr4d.size()
+        corr4d = corr4d.view(N, H, W, H*W).permute(0, 3, 1, 2) # Adapt to NCHW
+        ess = self.regress(corr4d)
+        ess_proj = self.projection_layer(ess)
+        return ess, ess_proj
     
     def forward_corr4d(self, x1, x2):
         feat1 = self.extract(x1, early_feat=self.early_feat)        
