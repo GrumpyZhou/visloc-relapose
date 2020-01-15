@@ -50,8 +50,7 @@ def predict_essential_matrix(data_root, dataset, data_loaders, model,
             # Calculate matches
             xA, yA, xB, yB, score = cal_matches(corr4d, delta4d, k_size=k_size,
                                                 do_softmax=do_softmax,
-                                                matching_both_directions=True,
-                                                recenter=False)
+                                                matching_both_directions=True)
 
             # Scale matches to original pixel level
             w, h = intrinsic_loader.w, intrinsic_loader.h
