@@ -10,7 +10,6 @@ python -m pipeline.sift_5pt \
         -odir 'output/sift_5pt'\
         -log 'results.dvlad.minmax.txt'
 
-# 7Scenes (This might take a very long time due to the exaustive matching process)
 python -m pipeline.sift_5pt \
         --data_root 'data/datasets_original/' \
         --dataset '7Scenes' \
