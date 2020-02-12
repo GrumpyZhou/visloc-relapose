@@ -5,9 +5,8 @@ import numpy as np
 
 def corr_to_matches(corr4d, delta4d=None, k_size=1, do_softmax=False, scale='centered', 
                     invert_matching_direction=False, return_indices=False):
-    to_cuda = lambda x: x.cuda() if corr4d.is_cuda else x        
-    batch_size,ch,fs1,fs2,fs3,fs4 = corr4d.size()
-    
+    to_cuda = lambda x: x.to(corr4d.device) if corr4d.is_cuda else x        
+    batch_size,ch,fs1,fs2,fs3,fs4 = corr4d.size()  # b, c, h, w, h, w
     if scale=='centered':
         XA,YA=np.meshgrid(np.linspace(-1,1,fs2*k_size),np.linspace(-1,1,fs1*k_size))
         XB,YB=np.meshgrid(np.linspace(-1,1,fs4*k_size),np.linspace(-1,1,fs3*k_size))
@@ -15,7 +14,6 @@ def corr_to_matches(corr4d, delta4d=None, k_size=1, do_softmax=False, scale='cen
         # Upsampled resolution linear space
         XA,YA=np.meshgrid(np.linspace(0,1,fs2*k_size),np.linspace(0,1,fs1*k_size))
         XB,YB=np.meshgrid(np.linspace(0,1,fs4*k_size),np.linspace(0,1,fs3*k_size))
-
     # Index meshgrid for current resolution
     JA,IA=np.meshgrid(range(fs2),range(fs1)) 
     JB,IB=np.meshgrid(range(fs4),range(fs3))
@@ -37,10 +35,10 @@ def corr_to_matches(corr4d, delta4d=None, k_size=1, do_softmax=False, scale='cen
         score=match_A_vals.view(batch_size,-1)
         
         # Pick the indices for the best score
-        iB=IB.view(-1)[idx_A_Bvec.view(-1)].view(batch_size,-1)
-        jB=JB.view(-1)[idx_A_Bvec.view(-1)].view(batch_size,-1)
-        iA=IA.expand_as(iB)
-        jA=JA.expand_as(jB)
+        iB=IB.view(-1)[idx_A_Bvec.view(-1)].view(batch_size,-1).contiguous()
+        jB=JB.view(-1)[idx_A_Bvec.view(-1)].view(batch_size,-1).contiguous()
+        iA=IA.expand_as(iB).contiguous()
+        jA=JA.expand_as(jB).contiguous()
         
     else:    
         nc_B_Avec=corr4d.view(batch_size,fs1*fs2,fs3,fs4) # [batch_idx,k_A,i_B,j_B]
@@ -49,11 +47,11 @@ def corr_to_matches(corr4d, delta4d=None, k_size=1, do_softmax=False, scale='cen
 
         match_B_vals,idx_B_Avec=torch.max(nc_B_Avec,dim=1)
         score=match_B_vals.view(batch_size,-1)
-
-        iA=IA.view(-1)[idx_B_Avec.view(-1)].view(batch_size,-1)
-        jA=JA.view(-1)[idx_B_Avec.view(-1)].view(batch_size,-1)
-        iB=IB.expand_as(iA)
-        jB=JB.expand_as(jA)
+        
+        iA=IA.view(-1)[idx_B_Avec.view(-1)].view(batch_size,-1).contiguous()
+        jA=JA.view(-1)[idx_B_Avec.view(-1)].view(batch_size,-1).contiguous() 
+        iB=IB.expand_as(iA).contiguous() 
+        jB=JB.expand_as(jA).contiguous()
 
     if delta4d is not None: # relocalization, it is also the case k_size > 1
         # The shift within the pooling window reference to (0,0,0,0)
@@ -83,7 +81,7 @@ def corr_to_matches(corr4d, delta4d=None, k_size=1, do_softmax=False, scale='cen
     
 def cal_matches(corr4d, delta4d, k_size=2, do_softmax=True, 
                 matching_both_directions=True, 
-                recenter=True, return_indices=False):
+                recenter=True, return_indices=False, unique=True):
     # reshape corr tensor and get matches for each point in image B
     batch_size,ch,fs1,fs2,fs3,fs4 = corr4d.size()
     if matching_both_directions:
@@ -110,14 +108,15 @@ def cal_matches(corr4d, delta4d, k_size=2, do_softmax=True,
         score_=score_.squeeze()[sorted_index].unsqueeze(0)
         
         # remove duplicates
-        concat_coords=np.concatenate((xA_.cpu().data.numpy(), yA_.cpu().data.numpy(),
-                                      xB_.cpu().data.numpy(),yB_.cpu().data.numpy()),0)
-        _,unique_index=np.unique(concat_coords,axis=1,return_index=True)
-        xA_=xA_.squeeze()[torch.cuda.LongTensor(unique_index)].unsqueeze(0)
-        yA_=yA_.squeeze()[torch.cuda.LongTensor(unique_index)].unsqueeze(0)
-        xB_=xB_.squeeze()[torch.cuda.LongTensor(unique_index)].unsqueeze(0)
-        yB_=yB_.squeeze()[torch.cuda.LongTensor(unique_index)].unsqueeze(0)
-        score_=score_.squeeze()[torch.cuda.LongTensor(unique_index)].unsqueeze(0)
+        if unique:
+            concat_coords=np.concatenate((xA_.cpu().data.numpy(), yA_.cpu().data.numpy(),
+                                          xB_.cpu().data.numpy(),yB_.cpu().data.numpy()),0)
+            _,unique_index=np.unique(concat_coords,axis=1,return_index=True)
+            xA_=xA_.squeeze()[torch.cuda.LongTensor(unique_index)].unsqueeze(0)
+            yA_=yA_.squeeze()[torch.cuda.LongTensor(unique_index)].unsqueeze(0)
+            xB_=xB_.squeeze()[torch.cuda.LongTensor(unique_index)].unsqueeze(0)
+            yB_=yB_.squeeze()[torch.cuda.LongTensor(unique_index)].unsqueeze(0)
+            score_=score_.squeeze()[torch.cuda.LongTensor(unique_index)].unsqueeze(0)
 
     elif flip_matching_direction:
         (xA_,yA_,xB_,yB_,score_)=corr_to_matches(corr4d, scale='positive',
@@ -130,8 +129,17 @@ def cal_matches(corr4d, delta4d, k_size=2, do_softmax=True,
                                                  do_softmax=do_softmax,
                                                  delta4d=delta4d, 
                                                  k_size=k_size)
+        
+    if return_indices:
+        xA = xA_.view(-1).data.cpu().numpy()
+        yA = yA_.view(-1).data.cpu().numpy()
+        xB = xB_.view(-1).data.cpu().numpy()
+        yB = yB_.view(-1).data.cpu().numpy()   
+        score = score_.view(-1).data.cpu().float().numpy()
+        return xA, yA, xB, yB, score
+    
     # recenter
-    if recenter:
+    if recenter:  # Shift by half pixel to fit into the range
         if k_size>1:
             yA_=yA_*(fs1*k_size-1)/(fs1*k_size)+0.5/(fs1*k_size)
             xA_=xA_*(fs2*k_size-1)/(fs2*k_size)+0.5/(fs2*k_size)
@@ -142,16 +150,10 @@ def cal_matches(corr4d, delta4d, k_size=2, do_softmax=True,
             xA_=xA_*(fs2-1)/fs2+0.5/fs2
             yB_=yB_*(fs3-1)/fs3+0.5/fs3
             xB_=xB_*(fs4-1)/fs4+0.5/fs4
-    
-    if return_indices:
-        xA = xA_.view(-1).data.cpu().numpy()
-        yA = yA_.view(-1).data.cpu().numpy()
-        xB = xB_.view(-1).data.cpu().numpy()
-        yB = yB_.view(-1).data.cpu().numpy()        
-    else:
-        xA = xA_.view(-1).data.cpu().float().numpy()
-        yA = yA_.view(-1).data.cpu().float().numpy()
-        xB = xB_.view(-1).data.cpu().float().numpy()
-        yB = yB_.view(-1).data.cpu().float().numpy()
+
+    xA = xA_.view(-1).data.cpu().float().numpy()
+    yA = yA_.view(-1).data.cpu().float().numpy()
+    xB = xB_.view(-1).data.cpu().float().numpy()
+    yB = yB_.view(-1).data.cpu().float().numpy()
     score = score_.view(-1).data.cpu().float().numpy()
     return xA, yA, xB, yB, score
