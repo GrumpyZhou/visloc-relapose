@@ -41,8 +41,7 @@ class CambridgeLandmarks:
         for im in im_list:
             f = self.focals[im]
             K = np.array([[f, 0, self.ox], [0, f, self.oy], [0, 0, 1]], dtype=np.float32) 
-            K_inv = np.linalg.inv(K)
-            matrices[im] = (K, K_inv)
+            matrices[im] = K
         return matrices
     
     def get_relative_intrinsic_matrix(self, im1, im2):
@@ -50,8 +49,6 @@ class CambridgeLandmarks:
         f2 = self.focals[im2]        
         f = (f1 + f2) / 2.0    # Compute mean focal of two images
         fx, fy = f, f
-        #s1 = f / f1
-        #s2 = f / f2
         K = np.array([[f, 0, self.ox], [0, f, self.oy], [0, 0, 1]]) 
         return K
 
@@ -65,10 +62,9 @@ class Scenes7:
         self.ox, self.oy = 320, 240
         self.f = 585
         self.K = np.array([[self.f, 0, self.ox], [0, self.f, self.oy], [0, 0, 1]], dtype=np.float32) 
-        self.K_inv = np.linalg.inv(self.K)
 
     def get_intrinsic_matrices(self, im_list):
-        matrices = {im : (self.K, self.K_inv) for im in im_list}
+        matrices = {im :self.K for im in im_list}
         return matrices
     
     def get_relative_intrinsic_matrix(self, *args):
@@ -89,10 +85,9 @@ class Prague:
         self.w, self.h, self.fx, self.fy, self.ox, self.oy = [float(p) for p in params[2::]]
         ff.close()
         self.K = np.array([[self.fx, 0, self.ox], [0, self.fy, self.oy], [0, 0, 1]], dtype=np.float32) 
-        self.K_inv = np.linalg.inv(self.K)
 
     def get_intrinsic_matrices(self, im_list):
-        matrices = {im : (self.K, self.K_inv) for im in im_list}
+        matrices = {im : self.K for im in im_list}
         return matrices
     
     def get_relative_intrinsic_matrix(self, *args):
