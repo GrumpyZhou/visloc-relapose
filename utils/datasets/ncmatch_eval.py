@@ -44,9 +44,10 @@ def get_cambridge_loaders(data_root, pair_txt, image_size=1920, incl_sces=None, 
                              with_virtual_pts=with_virtual_pts)
     data_loaders = {}
     for test_set in test_sets:
-        data_loaders[test_set.scene] = data.DataLoader(test_set, batch_size=1, 
+        data_loaders[test_set.scene] = (data.DataLoader(test_set, batch_size=1, 
                                                        shuffle=shuffle, num_workers=0,
-                                                       worker_init_fn=make_deterministic(seed=1))
+                                                       worker_init_fn=make_deterministic(seed=1)),
+                                        wt, ht)
     return data_loaders
 
 def get_7scenes_loaders(data_root, pair_txt, image_size=640, incl_sces=None, with_virtual_pts=False):
@@ -68,7 +69,8 @@ def get_7scenes_loaders(data_root, pair_txt, image_size=640, incl_sces=None, wit
                              with_virtual_pts=with_virtual_pts) 
     data_loaders = {}
     for test_set in test_sets:
-        data_loaders[test_set.scene] = data.DataLoader(test_set, batch_size=1, 
+        data_loaders[test_set.scene] = (data.DataLoader(test_set, batch_size=1, 
                                                        shuffle=False, num_workers=0,
-                                                       worker_init_fn=make_deterministic(seed=1))
+                                                       worker_init_fn=make_deterministic(seed=1)),
+                                        wt, ht)        
     return data_loaders

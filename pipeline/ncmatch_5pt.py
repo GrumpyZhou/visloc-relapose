@@ -20,13 +20,14 @@ def predict_essential_matrix(data_root, dataset, data_loaders, model,
                              k_size=2, do_softmax=True,
                              rthres=4.0, ncn_thres=0.9, log=None): 
     result_dict = {}
+    model.eval()
     for scene in data_loaders:
         result_dict[scene] = {}
-        data_loader = data_loaders[scene]
+        data_loader, wt, ht = data_loaders[scene]
         total_num = len(data_loader.dataset)  # Total image pair number
         base_dir = os.path.join(data_root, dataset)
         scene_dir = os.path.join(base_dir, scene)
-        intrinsic_loader = get_camera_intrinsic_loader(base_dir, dataset, scene)
+        intrinsic_loader = get_camera_intrinsic_loader(base_dir, dataset, scene, wt=wt, ht=ht)
   
         # Predict essential matrix over samples
         pair_data = {}
@@ -50,17 +51,17 @@ def predict_essential_matrix(data_root, dataset, data_loaders, model,
             # Calculate matches
             xA, yA, xB, yB, score = cal_matches(corr4d, delta4d, k_size=k_size,
                                                 do_softmax=do_softmax,
-                                                matching_both_directions=True)
+                                                matching_both_directions=True, return_indices=True)
 
             # Scale matches to original pixel level
-            w, h = intrinsic_loader.w, intrinsic_loader.h
-            matches = np.dstack([xA*w, yA*h, xB*w, yB*h]).squeeze() # N, 4
+            matches = 16 * np.dstack([xA, yA, xB, yB]).squeeze() # N, 4         
             K = intrinsic_loader.get_relative_intrinsic_matrix(train_im_ref, test_im_ref)            
             
             # Find essential matrix
             inds = np.where(score > ncn_thres)[0]
             score = score[inds]
             matches = matches[inds, :]
+
             p1 = matches[:,0:2]
             p2 = matches[:,2:4]
             E, inliers = cv2.findEssentialMat(p1, p2, cameraMatrix=K, method=cv2.FM_RANSAC, threshold=rthres)
