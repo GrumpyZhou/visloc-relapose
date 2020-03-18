@@ -1,6 +1,6 @@
 # Visual Localization Via Relative Camera Pose Estimation
 
-This repository provides implementation of  our paper:   To Learn or Not to Learn: Visual Localization from Essential Matrices [TO UPLOAD]
+This repository provides implementation of  our paper accepted by ICRA2020: [To Learn or Not to Learn: Visual Localization from Essential Matrices](https://arxiv.org/abs/1908.01293)
 
 ![Pipeline](pipeline/pipeline.jpg)
 
@@ -10,16 +10,19 @@ git clone git@github.com:GrumpyZhou/visloc-relapose.git
 ````
 
 ## Setup Running Environment
-We tested the code on Linux Ubuntu 16.04.6 with following versions:
+We have tested the code on Linux Ubuntu 16.04.6 under following environments:
 ````
-1. Python 3.6 + Pytorch 0.4.0  + CUDA 8.0 + CUDNN 8.0v5.1  (Paper version) 
-2. Python 3.6 + Pytorch 0.4.0  + CUDA 10.0 + CUDNN 10.0v7.5.1.10
-3. Python 3.7 + Pytorch 1.0  + CUDA 8.0 + CUDNN 8.0v5.1
-4. Python 3.7 + Pytorch 1.0  + CUDA 10.0 + CUDNN 10.0v7.5.1.10	(Latest version)
+Python 3.6 / 3.7
+Pytorch 0.4.0 / 1.0 / 1.1 
+CUDA 8.0 + CUDNN 8.0v5.1
+CUDA 10.0 + CUDNN 10.0v7.5.1.10
+
+The setting we used in the paper is:
+Python 3.7 + Pytorch 1.1 + CUDA 10.0 + CUDNN 10.0v7.5.1.10
 ````
 We recommend to use *Anaconda* to manage packages. Run following lines to automatically setup a ready environment for our code.
 ````
-conda env create -f environment.yml  # This one installs version 3./4.
+conda env create -f environment.yml  # Notice this one installs latest pytroch version.
 conda activte relapose
 ````
 Otherwise, one can try to download all required packages seperately according to their offical documentation.
