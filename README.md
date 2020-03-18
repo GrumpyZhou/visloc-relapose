@@ -81,7 +81,7 @@ python -m pipeline.sift_5pt \
         -log 'results.dvlad.minmax.txt'
 ````
 More evaluation examples see: [sift_5pt.sh](sift_5pt.sh). Check [example outputs](https://vision.in.tum.de/webshare/u/zhouq/visloc-relapose/sift_5pt/)
-Visualize SIFT correspondences using our notebook[TOADD].
+Visualize SIFT correspondences using [notebooks/visualize_sift_matches.ipynb](notebooks/visualize_sift_matches.ipynb).
 ##  Learning-based: Direct Regression via EssNet
 The _pipeline.relapose_regressor_ module can be used for  both training or testing our regression networks defined under *networks/*, e.g., EssNet, NCEssNet, RelaPoseNet... We provide training and testing examples in [regression.sh](regression.sh). 
 The module allows flexible variations of the setting. For more details about the module options, run `python -m pipeline.relapose_regressor -h`.
@@ -102,8 +102,8 @@ python -m pipeline.relapose_regressor \
 This command produces outputs are available online [here](https://vision.in.tum.de/webshare/u/zhouq/visloc-relapose/regression_models/example/). 
 
 #### Visdom (optional)
-As you see in the example above, we use [Visdom](https://github.com/facebookresearch/visdom) server to visualize the training process.  One can adapt the meters to plot inside [utils/common/visdom.py](utils/common/visdom.py). By default, previous example gives following plots[TOADD].
-If you DON'T want it, just remove the last line `-vp 9333 -vh 'localhost' -venv 'main' -vwin 'example.shopfacade'`.
+As you see in the example above, we use [Visdom](https://github.com/facebookresearch/visdom) server to visualize the training process.  One can adapt the meters to plot inside [utils/common/visdom.py](utils/common/visdom.py).
+If you DON'T want to use visdom, just remove the last line `-vp 9333 -vh 'localhost' -venv 'main' -vwin 'example.shopfacade'`.
 
 #### Trained models and weights
 We release all trained models that are used in our paper. One can download them from [pretrained regression models](https://vision.in.tum.de/webshare/u/zhouq/visloc-relapose/regression_models).
