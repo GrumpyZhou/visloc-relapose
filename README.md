@@ -1,6 +1,6 @@
-# Visual Localization Via Relative Camera Pose Estimation
+# 2D-2D Visual Localization Framework based on Essential Matrice
 
-This repository provides implementation of  our paper accepted by ICRA2020: [To Learn or Not to Learn: Visual Localization from Essential Matrices](https://arxiv.org/abs/1908.01293)
+This repository provides implementation of our paper accepted by ICRA2020: [To Learn or Not to Learn: Visual Localization from Essential Matrices](https://arxiv.org/abs/1908.01293)
 
 ![Pipeline](pipeline/pipeline.jpg)
 
