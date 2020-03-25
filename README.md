@@ -41,7 +41,7 @@ Our code is flexible for evaluation on various localization datasets. We use Cam
 	````
 4. Download [our pairs](https://vision.in.tum.de/webshare/u/zhouq/visloc-datasets/) for training, validation and testing. About the format of our pairs, check [readme](https://vision.in.tum.de/webshare/u/zhouq/visloc-datasets/README.md). 
 5. Place the pairs to corresponding folder under *data/datasets_original/CambridgeLandmarks*.
-6. Pre-save resized 480 images to speed up data loading time (Optional, but Recommended)
+6. Pre-save resized 480 images to speed up data loading time for regression models (Optional, but Recommended)
 	````
 	cd visloc-relapose/
 	python -m utils.datasets.resize_dataset \
@@ -49,8 +49,7 @@ Our code is flexible for evaluation on various localization datasets. We use Cam
 		--save_dir=data/datasets_480/CambridgeLandmarks \
 		--resize 480  --copy_txt True 
 	````
-7. Test your setup by visualizing the data using [notebooks/data_loading.ipynb](notebooks/data_loading.ipynb) .
-8. (Optional) One can also resize the dataset images so that the shorter side is 256 pixels, this makes training faster.
+7. Test your setup by visualizing the data using [notebooks/data_loading.ipynb](notebooks/data_loading.ipynb).
 
 #### 7Scenes Datasets
 We follow the camera pose label convention of Cambridge Landmarks dataset.  Similarly, you can download  [our pairs](https://vision.in.tum.de/webshare/u/zhouq/visloc-datasets/)  for 7Scenes. For **other datasets**, contact me for information about preprocessing and pair generation.
